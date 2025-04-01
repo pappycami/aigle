@@ -24,7 +24,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
-    private String nom;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -39,7 +39,7 @@ public class User {
     private String role; // ADMIN ou USER
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Profil profil;
+    private Profile profile;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Post> posts = new HashSet<>();
