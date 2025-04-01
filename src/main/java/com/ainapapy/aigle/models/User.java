@@ -10,7 +10,7 @@ import java.util.Set;
 public class User {
     
     public enum roles {
-        USER, ADMIN
+        ADMIN, USER, MODERATOR
     }
 
     @Id
@@ -30,7 +30,7 @@ public class User {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @Column(nullable = false)
-    private String role; // ADMIN ou USER
+    private User.roles role; // ADMIN ou USER
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Profile profile;
@@ -86,11 +86,11 @@ public class User {
         this.dateCreation = dateCreation;
     }
 
-    public String getRole() {
+    public User.roles getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(User.roles role) {
         this.role = role;
     }
 
@@ -118,7 +118,7 @@ public class User {
         this.groups = groups;
     }
 
-    public User(Long id, String name, String email, String password, String role, Profile profile) {
+    public User(Long id, String name, String email, String password, User.roles role, Profile profile) {
         this.id = id;
         this.name = name;
         this.email = email;
