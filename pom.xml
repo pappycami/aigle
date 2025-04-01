@@ -34,10 +34,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>         
-        </dependency>
         
         <!-- Spring Boot Starter Data JPA - HIbernate ORM -->
         <dependency>
