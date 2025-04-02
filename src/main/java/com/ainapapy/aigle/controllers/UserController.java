@@ -2,6 +2,7 @@ package com.ainapapy.aigle.controllers;
 
 import com.ainapapy.aigle.models.User;
 import com.ainapapy.aigle.models.dto.UserDTO;
+import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
 import com.ainapapy.aigle.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.validation.annotation.Validated;
 
 @RestController
 @RequestMapping("/api/users")
@@ -39,34 +41,40 @@ public class UserController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable Long id, 
+            @Validated(ValidationGroups.OnPut.class) @RequestBody UserDTO dto) 
+    {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            user.setEmail(updatedUser.getEmail());
-            user.setPassword(updatedUser.getPassword());
-            user.setRole(updatedUser.getRole());
+            user.setEmail(dto.getEmail());
+            user.setPassword(dto.getPassword());
+            user.setRole(userService.convertToRoleEnum(dto.getRole()));
             return ResponseEntity.ok(userService.convertToDTO(userService.saveUser(user)));
         }
         return ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDTO> partialUpdateUser(@PathVariable Long id, @RequestBody User partialUser) {
+    public ResponseEntity<UserDTO> partialUpdateUser(
+            @PathVariable Long id, 
+            @Validated(ValidationGroups.OnPatch.class) @RequestBody UserDTO dto) 
+    {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (partialUser.getEmail() != null) user.setEmail(partialUser.getEmail());
-            if (partialUser.getPassword() != null) user.setPassword(partialUser.getPassword());
-            if (partialUser.getRole() != null) user.setRole(partialUser.getRole());
+            if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+            if (dto.getPassword() != null) user.setPassword(dto.getPassword());
+            if (dto.getRole() != null) user.setRole(userService.convertToRoleEnum(dto.getRole()));
             return ResponseEntity.ok(userService.convertToDTO(userService.saveUser(user)));
         }
         return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("User deleted!");
     }
 }

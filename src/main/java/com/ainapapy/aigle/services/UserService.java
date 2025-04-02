@@ -110,7 +110,7 @@ public class UserService {
         return user;
     }
 
-    private User.roles convertToRoleEnum(String role) {
+    public User.roles convertToRoleEnum(String role) {
         try {
             return User.roles.valueOf(role.toUpperCase()); // Normalize to uppercase
         } catch (IllegalArgumentException e) {
