@@ -39,34 +39,34 @@ public class UserController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            user.setEmail(updatedUser.getEmail());
-            user.setPassword(updatedUser.getPassword());
-            user.setRole(updatedUser.getRole());
+            user.setEmail(dto.getEmail());
+            user.setPassword(dto.getPassword());
+            user.setRole(userService.convertToRoleEnum(dto.getRole()));
             return ResponseEntity.ok(userService.convertToDTO(userService.saveUser(user)));
         }
         return ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDTO> partialUpdateUser(@PathVariable Long id, @RequestBody User partialUser) {
+    public ResponseEntity<UserDTO> partialUpdateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (partialUser.getEmail() != null) user.setEmail(partialUser.getEmail());
-            if (partialUser.getPassword() != null) user.setPassword(partialUser.getPassword());
-            if (partialUser.getRole() != null) user.setRole(partialUser.getRole());
+            if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+            if (dto.getPassword() != null) user.setPassword(dto.getPassword());
+            if (dto.getRole() != null) user.setRole(userService.convertToRoleEnum(dto.getRole()));
             return ResponseEntity.ok(userService.convertToDTO(userService.saveUser(user)));
         }
         return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("User deleted!");
     }
 }

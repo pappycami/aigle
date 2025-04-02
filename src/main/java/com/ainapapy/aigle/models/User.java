@@ -10,7 +10,7 @@ import java.util.Set;
 public class User {
     
     public enum roles {
-        ADMIN, USER, MODERATOR
+        ADMIN, USER, MODERATOR, CONTRIBUTOR
     }
 
     @Id

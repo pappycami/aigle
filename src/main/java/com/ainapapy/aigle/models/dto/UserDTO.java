@@ -6,13 +6,16 @@ import java.util.List;
 public class UserDTO {
     private Long id;
     private String email;
+    private String role;
 
     // Only allow writing (POST, PUT, PATCH)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    private String role;
+    @JsonProperty(required = false)
     private ProfileDTO profile;
+    
+    @JsonProperty(required = false)
     private List<GroupDTO> groups;
 
     // Getters et Setters
