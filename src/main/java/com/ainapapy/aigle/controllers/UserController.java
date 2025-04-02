@@ -1,6 +1,5 @@
 package com.ainapapy.aigle.controllers;
 
-import com.ainapapy.aigle.models.User;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
 import com.ainapapy.aigle.services.UserService;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.validation.annotation.Validated;
 
 @RestController
@@ -22,22 +20,20 @@ public class UserController {
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers().stream()
-                .map(userService::convertToDTO)
-                .collect(Collectors.toList());
+        return userService.getAllUsersFormated();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        Optional<User> user = userService.getUserById(id);
-        return user.map(u -> ResponseEntity.ok(userService.convertToDTO(u)))
+        Optional<UserDTO> dto = userService.getUserByIdFormated(id);
+        return dto.map(u -> ResponseEntity.ok(u))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-        User user = userService.convertToEntity(userDTO);
-        return userService.convertToDTO(userService.saveUser(user));
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+        UserDTO newUser = userService.userSaved(userDTO);
+        return ResponseEntity.ok(newUser);
     }
     
     @PutMapping("/{id}")
@@ -45,13 +41,9 @@ public class UserController {
             @PathVariable Long id, 
             @Validated(ValidationGroups.OnPut.class) @RequestBody UserDTO dto) 
     {
-        Optional<User> userOptional = userService.getUserById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setEmail(dto.getEmail());
-            user.setPassword(dto.getPassword());
-            user.setRole(userService.convertToRoleEnum(dto.getRole()));
-            return ResponseEntity.ok(userService.convertToDTO(userService.saveUser(user)));
+        UserDTO userPuted = userService.PutUser(id, dto);
+        if ( userPuted != null) {
+            return ResponseEntity.ok(userPuted);
         }
         return ResponseEntity.notFound().build();
     }
@@ -61,13 +53,9 @@ public class UserController {
             @PathVariable Long id, 
             @Validated(ValidationGroups.OnPatch.class) @RequestBody UserDTO dto) 
     {
-        Optional<User> userOptional = userService.getUserById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (dto.getEmail() != null) user.setEmail(dto.getEmail());
-            if (dto.getPassword() != null) user.setPassword(dto.getPassword());
-            if (dto.getRole() != null) user.setRole(userService.convertToRoleEnum(dto.getRole()));
-            return ResponseEntity.ok(userService.convertToDTO(userService.saveUser(user)));
+        UserDTO userPatched = userService.PatchUser(id, dto);
+        if ( userPatched != null) {
+            return ResponseEntity.ok(userPatched);
         }
         return ResponseEntity.notFound().build();
     }

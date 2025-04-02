@@ -1,5 +1,7 @@
 package com.ainapapy.aigle.models.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -14,5 +16,9 @@ public class PostDTO {
     
     private String content;
     
-    private Long userId;
+    @JsonProperty(required = false)
+    private UserDTO user;
+    
+    @JsonProperty(required = false)
+    private List<CommentDTO> comments;
 }
