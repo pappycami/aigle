@@ -33,7 +33,8 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDTO createUser(@RequestBody User user) {
+    public UserDTO createUser(@RequestBody UserDTO userDTO) {
+        User user = userService.convertToEntity(userDTO);
         return userService.convertToDTO(userService.saveUser(user));
     }
     
