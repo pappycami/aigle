@@ -2,6 +2,7 @@ package com.ainapapy.aigle.controllers;
 
 import com.ainapapy.aigle.models.User;
 import com.ainapapy.aigle.models.dto.UserDTO;
+import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
 import com.ainapapy.aigle.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.validation.annotation.Validated;
 
 @RestController
 @RequestMapping("/api/users")
@@ -39,7 +41,10 @@ public class UserController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable Long id, 
+            @Validated(ValidationGroups.OnPut.class) @RequestBody UserDTO dto) 
+    {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -52,7 +57,10 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDTO> partialUpdateUser(@PathVariable Long id, @RequestBody UserDTO dto) {
+    public ResponseEntity<UserDTO> partialUpdateUser(
+            @PathVariable Long id, 
+            @Validated(ValidationGroups.OnPatch.class) @RequestBody UserDTO dto) 
+    {
         Optional<User> userOptional = userService.getUserById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
