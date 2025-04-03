@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts/base :: content(content=~{::content}, extraStyles=~{::extraStyles}, extraScripts=~{::extraScripts})}">
+    
 <head>
-    <meta charset="UTF-8">
-    <title>Application Aigle</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
+    <th:block th:fragment="extraStyles">
+        <style>
+            a {color: #220000}
+        </style>
+    </th:block>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" th:href="@{/}">Aigle</a>
-    </nav>
-    <div class="container">
+    <th:block th:fragment="content">
         <h2>Liste des utilisateurs</h2>
         <a th:href="@{/users/new}" class="btn btn-primary">Ajouter un utilisateur</a>
         <table class="table table-striped">
@@ -33,6 +35,10 @@
                 </tr>
             </tbody>
         </table>
-    </div>
+    </th:block>
+    
+    <th:block th:fragment="extraScripts">
+        <script th:src="@{/js/page-users-list.js}"></script>
+    </th:block>
 </body>
 </html>
