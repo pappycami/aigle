@@ -1,4 +1,4 @@
-package com.ainapapy.aigle.controllers;
+package com.ainapapy.aigle.controllers.api;
 
 import com.ainapapy.aigle.models.Comment;
 import com.ainapapy.aigle.services.CommentService;

@@ -1,4 +1,4 @@
-package com.ainapapy.aigle.controllers;
+package com.ainapapy.aigle.controllers.api;
 
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.models.dto.validations.ValidationGroups;

@@ -42,6 +42,11 @@ public class UserService {
         return userRepository.save(user);
     }
     
+    public void saveUserFromDto(UserDTO dto) {
+        User user = userConvertor.convertToEntity(dto);
+        this.saveUser(user);
+    }
+    
     public UserDTO userSaved(UserDTO userDTO) {
         User user = userConvertor.convertToEntity(userDTO);
         return userConvertor.convertToDTO(this.saveUser(user));
@@ -81,4 +86,6 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    
 }
