@@ -1,5 +1,6 @@
 package com.ainapapy.aigle.controllers.api;
 
+import com.ainapapy.aigle.exceptions.UserNotFoundException;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
 import com.ainapapy.aigle.services.UserService;
@@ -27,7 +28,7 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         Optional<UserDTO> dto = userService.getUserByIdFormated(id);
         return dto.map(u -> ResponseEntity.ok(u))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
     }
 
     @PostMapping
@@ -45,7 +46,7 @@ public class UserController {
         if ( userPuted != null) {
             return ResponseEntity.ok(userPuted);
         }
-        return ResponseEntity.notFound().build();
+        throw new UserNotFoundException("User for update ID " + id + " not found");
     }
 
     @PatchMapping("/{id}")
@@ -57,11 +58,13 @@ public class UserController {
         if ( userPatched != null) {
             return ResponseEntity.ok(userPatched);
         }
-        return ResponseEntity.notFound().build();
+        throw new UserNotFoundException("User for update ID " + id + " not found");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(
+            @PathVariable Long id ) 
+    {
         userService.deleteUser(id);
         return ResponseEntity.ok("User deleted!");
     }
