@@ -43,10 +43,7 @@ public class UserController {
             @Validated(ValidationGroups.OnPut.class) @RequestBody UserDTO dto) 
     {
         UserDTO userPuted = userService.PutUser(id, dto);
-        if ( userPuted != null) {
-            return ResponseEntity.ok(userPuted);
-        }
-        throw new UserNotFoundException("User for update ID " + id + " not found");
+        return ResponseEntity.ok(userPuted);
     }
 
     @PatchMapping("/{id}")
@@ -55,10 +52,7 @@ public class UserController {
             @Validated(ValidationGroups.OnPatch.class) @RequestBody UserDTO dto) 
     {
         UserDTO userPatched = userService.PatchUser(id, dto);
-        if ( userPatched != null) {
-            return ResponseEntity.ok(userPatched);
-        }
-        throw new UserNotFoundException("User for update ID " + id + " not found");
+        return ResponseEntity.ok(userPatched);
     }
 
     @DeleteMapping("/{id}")
