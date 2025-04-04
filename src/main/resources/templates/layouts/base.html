@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Application Aigle</title>
-        
-        <!-- Inclusion des styles -->
-        <th:block th:replace="fragments/head-scripts :: styles"></th:block>
-    </head>
-    <body>
-        
-        <!-- Inclusion du menu -->
-        <th:block th:replace="fragments/menu :: menu"></th:block>
-        
-        <main class="container" th:fragment="content">
-            <th:block th:insert="~{::content}">
-                <!-- This is where the content of the page will be inserted -->
-            </th:block>
-        </main>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content, extraStyles, extraScripts)">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Aigle</title>
 
-        <!-- Inclusion des scripts -->
-        <th:block th:replace="fragments/head-scripts :: scripts"></th:block>
-    </body>
+    <!-- Styles globaux + page -->
+    <th:block th:replace="fragments/head-scripts :: styles(extraStyles=${extraStyles})"></th:block>
+</head>
+<body>
+
+    <!-- Menu -->
+    <th:block th:replace="fragments/menu :: menu"></th:block>
+
+    <!-- Contenu principal -->
+    <main class="container mt-6">
+        <th:block th:replace="${content}"></th:block>
+    </main>
+
+    <!-- Scripts globaux + page -->
+    <th:block th:replace="fragments/head-scripts :: scripts(extraScripts=${extraScripts})"></th:block>
+
+</body>
 </html>
 

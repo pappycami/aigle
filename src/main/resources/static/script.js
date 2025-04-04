@@ -12,9 +12,11 @@
         $('iframe').resizeiframe();
     });
     
-    $(document).ready(() => {
+    /*
+     * $(document).ready(() => {
         $(".btn").on('click', function(){
             alert("bouton clicker!!!");
         });
     });
+     */
 })(jQuery);

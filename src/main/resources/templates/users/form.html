@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Application Aigle</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: layout(~{::content}, ~{::extraStyles}, ~{::extraScripts})}">
+
+<th:block th:fragment="extraStyles">
+    <style>
+        .aigle-form-color-pink { color: #fd1794; }
+        .aigle-form-color-orange { color: #f74600; }
+    </style>
+</th:block>
     
-    
+<th:block th:fragment="content">  
     <div class="container">
         <h2>Formulaire</h2>
         <form th:action="@{/users/save}" method="post" th:object="${user}">
@@ -35,6 +37,10 @@
             <a href="@{/users}" class="btn btn-secondary">Annuler</a>
         </form>
     </div>
-    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
-</body>
+</th:block>
+
+<th:block th:fragment="extraScripts">
+    <script th:src="@{/js/page-users-form.js}"></script>
+</th:block>
+
 </html>
