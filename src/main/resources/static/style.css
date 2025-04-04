@@ -6,6 +6,10 @@
     user-select: none;
 }
 
+.aigle-content {
+    margin-top: 6.5rem !important
+}
+
 @media (min-width: 768px) {
     .bd-placeholder-img-lg {
         font-size: 3.5rem;

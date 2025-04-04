@@ -3,23 +3,28 @@
       th:fragment="layout(content, extraStyles, extraScripts)">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <title>Application Aigle</title>
 
     <!-- Styles globaux + page -->
-    <th:block th:replace="fragments/head-scripts :: styles(extraStyles=${extraStyles})"></th:block>
+    <th:block th:replace="~{fragments/head-scripts :: styles(extraStyles=${extraStyles})}"></th:block>
 </head>
 <body>
 
     <!-- Menu -->
-    <th:block th:replace="fragments/menu :: menu"></th:block>
+    <th:block th:replace="~{fragments/menu :: menu}"></th:block>
 
     <!-- Contenu principal -->
-    <main class="container mt-4">
+    <main class="container aigle-content">
+        <!-- Affichage d’un message succès dans base.html -->
+        <div th:if="${success}" class="alert alert-success mt-1 mb-2" th:text="${success}"></div>
         <th:block th:replace="${content}"></th:block>
     </main>
 
     <!-- Scripts globaux + page -->
-    <th:block th:replace="fragments/head-scripts :: scripts(extraScripts=${extraScripts})"></th:block>
+    <th:block th:replace="~{fragments/head-scripts :: scripts(extraScripts=${extraScripts})}"></th:block>
 
 </body>
 </html>
