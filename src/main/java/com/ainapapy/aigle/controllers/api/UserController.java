@@ -9,7 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
 @RestController
@@ -61,5 +65,18 @@ public class UserController {
     {
         userService.deleteUser(id);
         return ResponseEntity.ok("User deleted!");
+    }
+    
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(Map.of(
+            "username", user.getUsername(),
+            "roles", user.getAuthorities()
+        ));
     }
 }
