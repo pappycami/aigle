@@ -8,6 +8,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
     
-    private final String jwtSecret = "aigleSecretKey"; // 🔐 à sécuriser en prod
+    @Value("${aigle.jwt.secret}")
+    private String jwtSecret;
     private final long jwtExpirationMs = 86400000; // 24h
 
     public String generateToken(Authentication authentication) {

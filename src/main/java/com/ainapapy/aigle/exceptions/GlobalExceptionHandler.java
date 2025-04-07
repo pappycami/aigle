@@ -85,6 +85,7 @@ public class GlobalExceptionHandler {
         // 📌 Retourne la page 404.html si c'est un navigateur;
         model.addAttribute("errorCode", this.status.value());
         model.addAttribute("errorMessage", this.exMessage);
+        this.template = (template != null && !template.isEmpty()) ? template : "default";
         return new ModelAndView("error/"+this.template, this.model.asMap());
     }
 

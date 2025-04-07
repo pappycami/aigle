@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -19,6 +20,9 @@ public class UserService {
         
     @Autowired
     private UserConvertor userConvertor;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -58,7 +62,7 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setEmail(dto.getEmail());
-            user.setPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
             user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
             return userConvertor.convertToDTO(this.saveUser(user));
         }
@@ -74,7 +78,7 @@ public class UserService {
                 user.setEmail(dto.getEmail());
             
             if (dto.getPassword() != null) 
-                user.setPassword(dto.getPassword());
+                user.setPassword(passwordEncoder.encode(dto.getPassword()));
             
             if (dto.getRole() != null) 
                 user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));

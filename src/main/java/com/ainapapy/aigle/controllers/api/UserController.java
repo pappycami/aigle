@@ -3,6 +3,7 @@ package com.ainapapy.aigle.controllers.api;
 import com.ainapapy.aigle.exceptions.UserNotFoundException;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
+import com.ainapapy.aigle.security.CustomUserDetails;
 import com.ainapapy.aigle.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
 @RestController
@@ -73,7 +73,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
         }
 
-        UserDetails user = (UserDetails) authentication.getPrincipal();
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         return ResponseEntity.ok(Map.of(
             "username", user.getUsername(),
             "roles", user.getAuthorities()
