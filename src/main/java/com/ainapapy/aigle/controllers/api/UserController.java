@@ -3,7 +3,7 @@ package com.ainapapy.aigle.controllers.api;
 import com.ainapapy.aigle.exceptions.UserNotFoundException;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
-import com.ainapapy.aigle.security.CustomUserDetails;
+import com.ainapapy.aigle.security.UserPrincipal;
 import com.ainapapy.aigle.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 
 @RestController
@@ -67,16 +67,15 @@ public class UserController {
         return ResponseEntity.ok("User deleted!");
     }
     
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        if (authentication == null) {
+    @GetMapping("/curr")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
         }
-
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        
         return ResponseEntity.ok(Map.of(
-            "username", user.getUsername(),
-            "roles", user.getAuthorities()
+            "username", userPrincipal.getEmail(),
+            "roles", userPrincipal.getAuthorities()
         ));
     }
 }

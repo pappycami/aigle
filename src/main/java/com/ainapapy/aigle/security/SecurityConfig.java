@@ -38,12 +38,12 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/images/**",
                     "/error", "/webjars/**"
                 ).permitAll()
-                .requestMatchers(HttpMethod.GET, "/posts/**", "/groups/**", "/users/**", "/**").permitAll()
+                //.requestMatchers(HttpMethod.GET, "/posts/**", "/groups/**", "/users/**", "/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .usernameParameter("email")
+                .usernameParameter("username")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/dashboard", true)
                 .permitAll()

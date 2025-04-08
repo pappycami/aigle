@@ -1,40 +1,50 @@
 package com.ainapapy.aigle.security;
 
-import com.ainapapy.aigle.models.User;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class CustomUserDetails implements UserDetails, Serializable {
-    
-    private static final long serialVersionUID = 102L;
-    
-    private final User user;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 
-    public CustomUserDetails(User user) {
-        this.user = user;
+public class UserPrincipal implements UserDetails, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final Long id;
+    private final String email;
+    private final String password;
+    private final String role;
+
+    public UserPrincipal(Long id, String email, String password, String role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
-    
-    public User getUser() {
-        return this.user;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().toString()));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return email;
     }
 
     @Override
@@ -56,5 +66,4 @@ public class CustomUserDetails implements UserDetails, Serializable {
     public boolean isEnabled() {
         return true;
     }
-    
 }
