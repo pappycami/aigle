@@ -1,6 +1,5 @@
 package com.ainapapy.aigle.security;
 
-import com.mysql.cj.x.protobuf.MysqlxExpect.Open.Condition.Key;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
     
     @Value("${aigle.jwt.secret}")
-    private String jwtSecret;
+    private String jwtSecret; // Ensure this is a String in your configuration
     private final long jwtExpirationMs = 86400000; // 24h
 
     public String generateToken(Authentication authentication) {
@@ -30,13 +29,13 @@ public class JwtTokenProvider {
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS512)
+                .signWith(getSignKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(jwtSecret.getBytes())
+                .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -46,7 +45,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(jwtSecret.getBytes())
+                .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token);
             return true;
