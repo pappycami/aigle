@@ -4,6 +4,10 @@ import com.ainapapy.aigle.models.User;
 import com.ainapapy.aigle.models.convertors.UserConvertor;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.repositories.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -95,6 +99,31 @@ public class AuthController {
         ));
     }
     
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        // Invalidate the session
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // Clear the SecurityContext
+        SecurityContextHolder.clearContext();
+
+        // Remove cookies
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // Set to true if using HTTPS
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // Expire the cookie immediately
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(Map.of(
+            "success", "ok",
+            "message", "Vous êtes déconnecté"
+        ));
+    }
+    
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         /**
@@ -102,10 +131,18 @@ public class AuthController {
          * Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserPrincipal user = (UserPrincipal) auth.getPrincipal();
          **/
-        
-        return ResponseEntity.ok(Map.of(
-            "email", userPrincipal.getEmail(),
-            "roles", userPrincipal.getAuthorities()
-        ));
+        Map mapRetour;
+        if(userPrincipal == null) {
+            mapRetour = Map.of(
+                "status", "NOT_CONNECTED",
+                "message", "Vous nêtes pas connecté"
+            ); 
+        } else {
+            mapRetour = Map.of(
+                "email", userPrincipal.getEmail(),
+                "roles", userPrincipal.getAuthorities()
+            );
+        }
+        return ResponseEntity.ok(mapRetour);
     }
 }

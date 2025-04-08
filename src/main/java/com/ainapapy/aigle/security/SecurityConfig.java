@@ -4,7 +4,6 @@ package com.ainapapy.aigle.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,7 +44,7 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/dashboard", true)
+                .defaultSuccessUrl("/", true)
                 .permitAll()
             )
             .logout(logout -> logout
@@ -74,7 +73,7 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
             String token = tokenProvider.generateToken(authentication);
             response.setHeader("Authorization", "Bearer " + token);
-            response.sendRedirect("/dashboard"); // Ou renvoyer JSON si appel API
+            response.sendRedirect("/"); // Ou renvoyer JSON si appel API
         };    
     }
 

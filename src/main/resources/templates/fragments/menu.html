@@ -27,6 +27,15 @@
                     <li class="nav-item">
                         <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
                     </li>
+                    
+                    <!-- Lien de déconnexion visible seulement si connecté -->
+                    <th:block th:if="${currentUser != null}">
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="btn btn-link nav-link">Déconnexion</button>
+                        </form>
+                    </li>
+                    </th:block>
                 </ul>
                 <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
