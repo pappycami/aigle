@@ -10,7 +10,7 @@ public class GlobalControllerAdvice {
 
     @ModelAttribute("currentUser")
     public UserPrincipal currentUser(Authentication authentication) {
-        System.out.println(">>>>>> Miditra ato tsika .......");
+        //System.out.println(">>>>>> Get Current user .......");
         if (authentication != null && authentication.isAuthenticated()
                 && authentication.getPrincipal() instanceof UserPrincipal) {
             return (UserPrincipal) authentication.getPrincipal();

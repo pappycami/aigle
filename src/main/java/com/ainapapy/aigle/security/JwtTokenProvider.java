@@ -19,20 +19,37 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
     
     @Value("${aigle.jwt.secret}")
-    private String jwtSecret; // Ensure this is a String in your configuration
-    private final long jwtExpirationMs = 86400000; // 24h
+    private String jwtSecret;
+    
+    private final long jwtExpirationMs = 15 * 60 * 1000; // 15 minutes
+    private final long jwtRefreshExpirationMs = 7 * 24 * 60 * 60 * 1000; // 7 jours
 
-    public String generateToken(Authentication authentication) {
+    public String generateAccessToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        String role = userPrincipal.getAuthorities().stream().findFirst().get().getAuthority(); // "ROLE_ADMIN"
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
+                .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSignKey(), SignatureAlgorithm.HS512)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    public String generateRefreshToken(Authentication authentication) {
+        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        String role = userPrincipal.getAuthorities().stream().findFirst().get().getAuthority(); // "ROLE_ADMIN"
+
+        return Jwts.builder()
+                .setSubject(userPrincipal.getUsername())
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshExpirationMs))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
@@ -40,6 +57,15 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public String getRoleFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
     }
 
     public boolean validateToken(String token) {
@@ -72,5 +98,5 @@ public class JwtTokenProvider {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    
+
 }
