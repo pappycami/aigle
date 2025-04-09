@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/base :: layout(~{::content}, ~{::extraStyles}, ~{::extraScripts})}">
+
+<th:block th:fragment="extraStyles">
+    <style>
+        .aigle-form-color-pink { color: #fd1794; }
+        .aigle-form-color-orange { color: #f74600; }
+        .error { color: red; font-size: small; }
+    </style>
+</th:block>
+    
+<th:block th:fragment="content">
+    <h2>Formulaire</h2>
+    <form th:action="@{/users/save}" method="post" th:object="${user}">
+        <!-- Message global (par ex. pour erreurs générales) -->
+        <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+            <ul>
+                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label for="email">Email :</label>
+            <input type="email" id="email" class="form-control" th:field="*{email}" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"/>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            <div class="error text-danger"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" class="form-control" th:field="*{password}" />
+            <div class="error text-danger"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="role">Rôle :</label>
+            <select id="role" class="form-control" th:field="*{role}" th:classappend="${#fields.hasErrors('role')} ? 'is-invalid' : ''">
+                <option value="">-- Sélectionner un rôle --</option>
+                <option value="USER">Utilisateur</option>
+                <option value="CONTRIBUTOR">Contribuleur</option>
+                <option value="MODERATOR">Moderateur</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+            <div class="error text-danger"></div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a th:href="@{/users}" class="btn btn-secondary">Annuler</a>
+    </form>
+</th:block>
+
+<th:block th:fragment="extraScripts">
+    <script th:src="@{/js/page-users-form.js}"></script>
+</th:block>
+
+</html>

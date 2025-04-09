@@ -1,5 +1,6 @@
 package com.ainapapy.aigle.services;
 
+import com.ainapapy.aigle.exceptions.UserNotFoundException;
 import com.ainapapy.aigle.models.User;
 import com.ainapapy.aigle.models.convertors.UserConvertor;
 import com.ainapapy.aigle.models.dto.UserDTO;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -18,6 +20,9 @@ public class UserService {
         
     @Autowired
     private UserConvertor userConvertor;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -42,6 +47,11 @@ public class UserService {
         return userRepository.save(user);
     }
     
+    public void saveUserFromDto(UserDTO dto) {
+        User user = userConvertor.convertToEntity(dto);
+        this.saveUser(user);
+    }
+    
     public UserDTO userSaved(UserDTO userDTO) {
         User user = userConvertor.convertToEntity(userDTO);
         return userConvertor.convertToDTO(this.saveUser(user));
@@ -52,11 +62,11 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setEmail(dto.getEmail());
-            user.setPassword(dto.getPassword());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
             user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
             return userConvertor.convertToDTO(this.saveUser(user));
         }
-        return null;
+        throw new UserNotFoundException("User for Put ID: " + id + " not found");
     }
     
     public UserDTO PatchUser(Long id, UserDTO dto) {
@@ -68,17 +78,23 @@ public class UserService {
                 user.setEmail(dto.getEmail());
             
             if (dto.getPassword() != null) 
-                user.setPassword(dto.getPassword());
+                user.setPassword(passwordEncoder.encode(dto.getPassword()));
             
             if (dto.getRole() != null) 
                 user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
             
             return userConvertor.convertToDTO(this.saveUser(user));
         }
-        return null;
+        throw new UserNotFoundException("User for Patch ID: " + id + " not found");
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        Optional<User> userToDelete = this.getUserById(id);
+        if (userToDelete.isPresent()) {
+            userRepository.deleteById(id);
+        }
+        throw new UserNotFoundException("User for Delete ID: " + id + " not found");
     }
+
+    
 }

@@ -1,9 +1,8 @@
 package com.ainapapy.aigle.models.dto;
 
-import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
@@ -14,13 +13,15 @@ public class UserDTO {
     
     private Long id;
     
-    @NotNull(groups = ValidationGroups.OnPut.class)
+    @NotBlank(message = "L'email est obligatoire")
+    @Email(message = "Email invalide")
     private String email;
     
-    @NotNull(groups = ValidationGroups.OnPut.class)
+    @NotBlank(message = "Rôle requis")
     private String role;
 
-    @NotNull(groups = ValidationGroups.OnPatch.class)
+    @NotBlank(message = "Le motDePasse est obligatoire")
+    @Size(min = 6, message = "Minimum 6 caractères")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

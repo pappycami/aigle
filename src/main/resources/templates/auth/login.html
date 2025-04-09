@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login | Aigle</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" />
+</head>
+<body class="container mt-5">
+    <h2>Connexion</h2>
+    
+    <form method="post" th:action="@{/login}">
+        <div class="mb-3">
+            <label for="username" class="form-label">Email</label>
+            <input id="username" name="username" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input id="password" type="password" name="password" class="form-control" required />
+        </div>
+        <button class="btn btn-primary" type="submit">Connexion</button>
+    </form>
+
+    <div th:if="${param.error}" class="alert alert-danger mt-3">
+        Email ou mot de passe invalide.
+    </div>
+
+    <div th:if="${param.logout}" class="alert alert-info mt-3">
+        Vous êtes déconnecté.
+    </div>
+</body>
+</html>

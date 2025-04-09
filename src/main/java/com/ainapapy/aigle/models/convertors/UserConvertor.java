@@ -7,6 +7,7 @@ import com.ainapapy.aigle.models.dto.UserDTO;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +17,9 @@ public class UserConvertor {
     private ProfileConvertor profileConvertor;
     
     @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    @Autowired
     private GroupConvertor groupConvertor;
     
     // Convertir UserDTO en User (utile pour la création et mise à jour)
@@ -23,7 +27,7 @@ public class UserConvertor {
         User user = new User();
         user.setId(dto.getId());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(convertToRoleEnum(dto.getRole())); // Convertir String en Enum
 
         if (dto.getProfile() != null) {

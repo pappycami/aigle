@@ -1,14 +1,19 @@
-package com.ainapapy.aigle.controllers;
+package com.ainapapy.aigle.controllers.api;
 
+import com.ainapapy.aigle.exceptions.UserNotFoundException;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.models.dto.validations.ValidationGroups;
+import com.ainapapy.aigle.security.UserPrincipal;
 import com.ainapapy.aigle.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 
 @RestController
@@ -27,7 +32,7 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         Optional<UserDTO> dto = userService.getUserByIdFormated(id);
         return dto.map(u -> ResponseEntity.ok(u))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
     }
 
     @PostMapping
@@ -42,10 +47,7 @@ public class UserController {
             @Validated(ValidationGroups.OnPut.class) @RequestBody UserDTO dto) 
     {
         UserDTO userPuted = userService.PutUser(id, dto);
-        if ( userPuted != null) {
-            return ResponseEntity.ok(userPuted);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(userPuted);
     }
 
     @PatchMapping("/{id}")
@@ -54,15 +56,26 @@ public class UserController {
             @Validated(ValidationGroups.OnPatch.class) @RequestBody UserDTO dto) 
     {
         UserDTO userPatched = userService.PatchUser(id, dto);
-        if ( userPatched != null) {
-            return ResponseEntity.ok(userPatched);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(userPatched);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(
+            @PathVariable Long id ) 
+    {
         userService.deleteUser(id);
         return ResponseEntity.ok("User deleted!");
+    }
+    
+    @GetMapping("/curr")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+        
+        return ResponseEntity.ok(Map.of(
+            "username", userPrincipal.getEmail(),
+            "roles", userPrincipal.getAuthorities()
+        ));
     }
 }
