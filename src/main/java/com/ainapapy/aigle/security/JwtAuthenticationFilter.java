@@ -2,6 +2,7 @@ package com.ainapapy.aigle.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,15 +31,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException 
     {
         final String header = request.getHeader("Authorization");
-        final String jwt;
         final String username;
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        String jwt = null;
+        
+        // Vérifie d'abord dans le header
+        if (header != null && header.startsWith("Bearer ")) {
+            jwt = header.substring(7);
+        } else {
+            // Sinon, essaie de récupérer depuis les cookies
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if (cookie.getName().equals("accessToken")) {
+                        jwt = cookie.getValue();
+                        break;
+                    }
+                }
+            }
         }
         
-        jwt = header.substring(7);
         username = jwtTokenProvider.getUsernameFromToken(jwt);
         
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

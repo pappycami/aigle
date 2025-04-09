@@ -1,5 +1,6 @@
 package com.ainapapy.aigle.security;
 
+import com.ainapapy.aigle.exceptions.TokenExpiredException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -50,25 +51,38 @@ public class JwtTokenProvider {
                 .compact();
     }
     
-    public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder()
+    public String getUsernameFromToken(String token) throws TokenExpiredException {
+        try {
+            return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException e) {
+            System.err.println(">>> Erreur TOKEN (getUsernameFromToken) ----");
+            System.err.println(e.getMessage());
+            return null;
+        }
     }
 
-    public String getRoleFromToken(String token) {
-        return Jwts.parserBuilder()
+    public String getRoleFromToken(String token)  throws TokenExpiredException  {
+        try {
+            return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("role", String.class);
+        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException e) {
+            System.err.println(">>> Erreur TOKEN (getRoleFromToken) ----");
+            System.err.println(e.getMessage());
+            return null;
+        }
+        
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token)  throws TokenExpiredException  {
         try {
             Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
