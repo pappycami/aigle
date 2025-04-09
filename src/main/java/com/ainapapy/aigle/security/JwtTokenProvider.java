@@ -40,11 +40,9 @@ public class JwtTokenProvider {
 
     public String generateRefreshToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-        String role = userPrincipal.getAuthorities().stream().findFirst().get().getAuthority(); // "ROLE_ADMIN"
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshExpirationMs))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)

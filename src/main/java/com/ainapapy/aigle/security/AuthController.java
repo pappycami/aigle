@@ -22,6 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,8 +86,61 @@ public class AuthController {
         ));
     }
     
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshTokenWithPost(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String refreshToken = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("refreshToken")) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null || !tokenProvider.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing refresh token");
+        }
+
+        String username = tokenProvider.getUsernameFromToken(refreshToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+ 
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        String newAccessToken = tokenProvider.generateAccessToken(auth);
+        String newRefreshToken = tokenProvider.generateRefreshToken(auth);
+        
+        // Création des cookies sécurisés
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+                .httpOnly(true)
+                .secure(true) // à true si HTTPS
+                .path("/")
+                .maxAge(Duration.ofMinutes(15))
+                .sameSite("Strict")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(true) // à true si HTTPS
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+
+        // Ajouter les cookies à la réponse
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return ResponseEntity.ok(Map.of(
+            "message", "Access token and refreshtoken Updated",
+            "accessToken", newAccessToken,
+            "refreshToken", newRefreshToken
+        ));
+    }
+
+    
     @GetMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
+    public ResponseEntity<?> refreshTokenWithGet(@RequestParam String refreshToken, HttpServletResponse response) throws Exception {
         if (!tokenProvider.validateToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
         }
@@ -94,11 +148,36 @@ public class AuthController {
         String username = tokenProvider.getUsernameFromToken(refreshToken);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        String newAccessToken = tokenProvider.generateAccessToken(
-            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        
+        String newAccessToken = tokenProvider.generateAccessToken(auth);
+        String newRefreshToken = tokenProvider.generateRefreshToken(auth);
+        
+        // Création des cookies sécurisés
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+                .httpOnly(true)
+                .secure(true) // à true si HTTPS
+                .path("/")
+                .maxAge(Duration.ofMinutes(15))
+                .sameSite("Strict")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(true) // à true si HTTPS
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+
+        // Ajouter les cookies à la réponse
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return ResponseEntity.ok(Map.of(
-            "accessToken", newAccessToken
+            "message", "Access token and refreshtoken Updated",
+            "accessToken", newAccessToken,
+            "refreshToken", newRefreshToken
         ));
     }
 
@@ -150,30 +229,41 @@ public class AuthController {
         ));
     }
     
-    @PostMapping("/logout")
+    @DeleteMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        // Invalidate the session
+        // 1. Invalider la session si elle existe
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
 
-        // Clear the SecurityContext
+        // 2. Nettoyer le contexte de sécurité
         SecurityContextHolder.clearContext();
 
-        // Remove cookies
-        Cookie cookie = new Cookie("JSESSIONID", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // Set to true if using HTTPS
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // Expire the cookie immediately
-        response.addCookie(cookie);
+        // 3. Supprimer les cookies spécifiques
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("JSESSIONID".equals(cookie.getName()) 
+                        || "refreshToken".equals(cookie.getName())
+                        || "accessToken".equals(cookie.getName())
+                   ) 
+                {
+                    Cookie toDelete = new Cookie(cookie.getName(), null);
+                    toDelete.setPath("/");
+                    toDelete.setHttpOnly(true);
+                    toDelete.setMaxAge(0); // expire immédiatement
+                    toDelete.setSecure(true); // true si HTTPS
+                    response.addCookie(toDelete);
+                }
+            }
+        }
 
         return ResponseEntity.ok(Map.of(
             "success", "ok",
             "message", "Vous êtes déconnecté"
         ));
     }
+
     
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
