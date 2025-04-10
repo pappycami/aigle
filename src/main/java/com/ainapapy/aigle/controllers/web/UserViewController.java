@@ -2,12 +2,16 @@ package com.ainapapy.aigle.controllers.web;
 
 
 import com.ainapapy.aigle.models.dto.UserDTO;
+import com.ainapapy.aigle.security.AuthController;
 import com.ainapapy.aigle.services.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,12 +28,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/users")
 public class UserViewController {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(UserViewController.class);
 
     @Autowired
     private UserService userService;
 
     @GetMapping
-    public String listUsers(Model model) {
+    public String listUsers(Model model, HttpSession session) {
+        
+        LOG.debug(">>>> Session ID: " + session.getId());
+        
         List<UserDTO> users = userService.getAllUsersFormated();
         model.addAttribute("users", users);
         return "users/list";
