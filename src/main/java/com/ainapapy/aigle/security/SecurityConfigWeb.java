@@ -26,7 +26,7 @@ public class SecurityConfigWeb {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/login", "/register",
-                        "/swagger-ui/**", "/documentation-api/**", "/v3/api-docs/**",
+                        "/swagger-ui/**", "/documentation-api/**", "/v3/api-docs/**", "/actuator/**",
                         "/css/**", "/js/**", 
                         "/images/**", "/webjars/**", 
                         "/error")
