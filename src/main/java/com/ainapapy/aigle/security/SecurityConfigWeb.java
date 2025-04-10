@@ -16,12 +16,17 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfigWeb {
 
     @Bean
-    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain webFilterChain(HttpSecurity http) 
+            throws Exception 
+    {
+        
         http
+            .securityMatcher("/**") // ou laisse vide si tu veux que ça s'applique partout
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/login", "/register", 
+                        "/login", "/register",
+                        "/swagger-ui/**", "/documentation-api/**", "/v3/api-docs/**",
                         "/css/**", "/js/**", 
                         "/images/**", "/webjars/**", 
                         "/error")
