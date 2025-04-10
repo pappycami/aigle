@@ -35,6 +35,14 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- Spring DevTools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional> <!-- ou <scope>runtime</scope> -->
+        </dependency>
+
+        
         <!-- Spring Boot Starter Data JPA - HIbernate ORM -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
