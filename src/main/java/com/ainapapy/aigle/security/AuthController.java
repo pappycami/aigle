@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.time.Duration;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,6 +58,8 @@ public class AuthController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
     
+    private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
+    
     @Operation(
         summary = "Enregister un nouveau utilisateur", 
         description = "Enregister une nouvelle Utilisateur"
@@ -79,7 +83,8 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(User.roles.USER);
         userRepository.save(user);
-                
+        
+        LOG.debug(">>> Register: "+user.getEmail());
         Authentication auth = authManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 dto.getEmail(), dto.getPassword()
@@ -259,7 +264,8 @@ public class AuthController {
         // Ajouter les cookies à la réponse
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
+        
+        LOG.info(">>> Login par API : "+user.getEmail());
         return ResponseEntity.ok(Map.of(
             "accessToken", accessToken,
             "refreshToken", refreshToken,
