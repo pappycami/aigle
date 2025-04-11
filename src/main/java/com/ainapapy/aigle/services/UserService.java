@@ -10,10 +10,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -44,6 +48,7 @@ public class UserService {
     }
 
     public User saveUser(User user) {
+        LOG.debug(">>> User Save", user);
         return userRepository.save(user);
     }
     

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ainapapy</groupId>
     <artifactId>aigle</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>aigle</name>
     <description>Aigle pour porfolio</description>

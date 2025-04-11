@@ -2,7 +2,6 @@ package com.ainapapy.aigle.controllers.web;
 
 
 import com.ainapapy.aigle.models.dto.UserDTO;
-import com.ainapapy.aigle.security.AuthController;
 import com.ainapapy.aigle.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
