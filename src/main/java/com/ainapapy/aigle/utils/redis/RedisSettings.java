@@ -13,10 +13,8 @@ import org.springframework.stereotype.Component;
 @Setter
 public class RedisSettings {
 
-    private String host;
-    private int port;
-    private int database;
-    private String password;
     private String namespace;
     private Duration timeout;
+    private String tokenPrefix;
+    private String cachePrefix;
 }
