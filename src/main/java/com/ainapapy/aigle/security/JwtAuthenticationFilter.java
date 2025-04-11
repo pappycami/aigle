@@ -37,31 +37,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Vérifie d'abord dans le header
         if (header != null && header.startsWith("Bearer ")) {
             jwt = header.substring(7);
-        } else {
+        } else if (request.getCookies() != null) {
             // Sinon, essaie de récupérer depuis les cookies
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if (cookie.getName().equals("accessToken")) {
-                        jwt = cookie.getValue();
-                        break;
-                    }
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("accessToken")) {
+                    jwt = cookie.getValue();
+                    break;
                 }
             }
         }
         
-        username = jwtTokenProvider.getUsernameFromToken(jwt);
-        
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            
-            if (jwtTokenProvider.isTokenValid(jwt, userDetails )) {
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+        // ✅ Empêche l'erreur si token absent
+        if (jwt != null && !jwt.isBlank()) {
+            username = jwtTokenProvider.getUsernameFromToken(jwt); 
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                if (jwtTokenProvider.isTokenValid(jwt, userDetails )) {
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
+        
         filterChain.doFilter(request, response);
     }
     
