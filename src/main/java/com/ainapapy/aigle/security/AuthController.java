@@ -4,12 +4,18 @@ import com.ainapapy.aigle.models.User;
 import com.ainapapy.aigle.models.convertors.UserConvertor;
 import com.ainapapy.aigle.models.dto.UserDTO;
 import com.ainapapy.aigle.repositories.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.time.Duration;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,7 +58,16 @@ public class AuthController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
     
+    private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
     
+    @Operation(
+        summary = "Enregister un nouveau utilisateur", 
+        description = "Enregister une nouvelle Utilisateur"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Authentification réussie"),
+        @ApiResponse(responseCode = "401", description = "Identifiants invalides")
+    })
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserDTO dto) throws Exception {
         
@@ -68,7 +83,8 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(User.roles.USER);
         userRepository.save(user);
-                
+        
+        LOG.debug(">>> Register: "+user.getEmail());
         Authentication auth = authManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 dto.getEmail(), dto.getPassword()
@@ -86,6 +102,14 @@ public class AuthController {
         ));
     }
     
+    @Operation(
+        summary = "Rafraissir le tokken", 
+        description = "Retourne un token JWT si les identifiants sont valides"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Authentification réussie"),
+        @ApiResponse(responseCode = "401", description = "Identifiants invalides")
+    })
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshTokenWithPost(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String refreshToken = null;
@@ -138,9 +162,20 @@ public class AuthController {
         ));
     }
 
-    
+    @Operation(
+        summary = "Rafraissir le tokken en utilisant 'refreshToken' en url", 
+        description = "Retourne un token JWT si les identifiants sont valides"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Authentification réussie"),
+        @ApiResponse(responseCode = "401", description = "Identifiants invalides")
+    })
     @GetMapping("/refresh")
-    public ResponseEntity<?> refreshTokenWithGet(@RequestParam String refreshToken, HttpServletResponse response) throws Exception {
+    public ResponseEntity<?> refreshTokenWithGet(
+            @Parameter(name = "refreshToken", description = "Le token de rafraîchissement")
+            @RequestParam String refreshToken, 
+            HttpServletResponse response) 
+                throws Exception {
         if (!tokenProvider.validateToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
         }
@@ -181,6 +216,14 @@ public class AuthController {
         ));
     }
 
+    @Operation(
+            summary = "Authentifier un utilisateur", 
+            description = "Retourne un token JWT si les identifiants sont valides"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Authentification réussie"),
+        @ApiResponse(responseCode = "401", description = "Identifiants invalides")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) throws Exception {
         
@@ -221,7 +264,8 @@ public class AuthController {
         // Ajouter les cookies à la réponse
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
+        
+        LOG.info(">>> Login par API : "+user.getEmail());
         return ResponseEntity.ok(Map.of(
             "accessToken", accessToken,
             "refreshToken", refreshToken,
@@ -229,6 +273,10 @@ public class AuthController {
         ));
     }
     
+    @Operation(
+        summary = "Deconnecter", 
+        description = "Deconnecte une utilisateur"
+    )
     @DeleteMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         // 1. Invalider la session si elle existe
