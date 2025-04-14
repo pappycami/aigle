@@ -19,13 +19,14 @@ public class RedisConfig {
     
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
+        System.out.println(">>>>> Redis Connection ENTER: ");
         return new LettuceConnectionFactory();
     } 
     
     @PostConstruct
     public void showCustomValues() {
-        System.out.println("✅ Redis Namespace: " + redisSettings.getNamespace());
-        System.out.println("✅ JWT Prefix: " + redisSettings.getTokenPrefix());
+        System.out.println(">>>>> Redis Namespace: " + redisSettings.getNamespace());
+        System.out.println(">>>>> JWT Prefix: " + redisSettings.getTokenPrefix());
     }
    
 }

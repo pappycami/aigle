@@ -50,10 +50,6 @@ public class JwtTokenProvider {
     }
     
     public String getUsernameFromToken(String token) throws TokenExpiredException {
-        if (token == null || token.isBlank()) {
-            System.err.println(">>> Le TOKEN est null (getUsernameFromToken) ----");
-            return null;
-        }
         try {
             return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
