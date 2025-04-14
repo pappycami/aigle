@@ -20,7 +20,6 @@ public class UserDTO {
     @NotBlank(message = "Rôle requis")
     private String role;
 
-    @NotBlank(message = "Le motDePasse est obligatoire")
     @Size(min = 6, message = "Minimum 6 caractères")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
