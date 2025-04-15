@@ -3,8 +3,10 @@ package com.ainapapy.aigle.security;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @Order(1)
+@PropertySource("classpath:client-api-front.properties")
 public class SecurityConfigApi {
 
     @Autowired
@@ -23,6 +26,9 @@ public class SecurityConfigApi {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    
+    @Value("${url.front}")
+    private String urlFrontEnd;
 
     @Bean
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
@@ -52,7 +58,7 @@ public class SecurityConfigApi {
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // ton frontend React
+        config.setAllowedOrigins(List.of(urlFrontEnd));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // ⬅️ TRÈS IMPORTANT pour permettre les cookies
