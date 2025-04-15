@@ -63,42 +63,44 @@ public class UserService {
     }
     
     public UserDTO PutUser(Long id, UserDTO dto) {
-        Optional<User> userOptional = this.getUserById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setEmail(dto.getEmail());
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
-            user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
-            return userConvertor.convertToDTO(this.saveUser(user));
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User for PUT ID: " + id + " not found");  
         }
-        throw new UserNotFoundException("User for Put ID: " + id + " not found");
+        
+        Optional<User> userOptional = this.getUserById(id);
+        User user = userOptional.get();
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
+        return userConvertor.convertToDTO(this.saveUser(user));
     }
     
     public UserDTO PatchUser(Long id, UserDTO dto) {
-        Optional<User> userOptional = this.getUserById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            
-            if (dto.getEmail() != null) 
-                user.setEmail(dto.getEmail());
-            
-            if (dto.getPassword() != null) 
-                user.setPassword(passwordEncoder.encode(dto.getPassword()));
-            
-            if (dto.getRole() != null) 
-                user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
-            
-            return userConvertor.convertToDTO(this.saveUser(user));
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User for Patch ID: " + id + " not found");  
         }
-        throw new UserNotFoundException("User for Patch ID: " + id + " not found");
+        Optional<User> userOptional = this.getUserById(id);
+        
+        User user = userOptional.get();
+
+        if (dto.getEmail() != null) 
+            user.setEmail(dto.getEmail());
+
+        if (dto.getPassword() != null) 
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        if (dto.getRole() != null) 
+            user.setRole(userConvertor.convertToRoleEnum(dto.getRole()));
+
+        return userConvertor.convertToDTO(this.saveUser(user));
+        
     }
 
     public void deleteUser(Long id) {
-        Optional<User> userToDelete = this.getUserById(id);
-        if (userToDelete.isPresent()) {
-            userRepository.deleteById(id);
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User for Delete ID: " + id + " not found");
         }
-        throw new UserNotFoundException("User for Delete ID: " + id + " not found");
+        userRepository.deleteById(id);
     }
 
     
