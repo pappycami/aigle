@@ -4,11 +4,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserPrincipal implements UserDetails, Serializable {
+public class UserPrincipal implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 

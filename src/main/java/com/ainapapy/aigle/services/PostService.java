@@ -2,7 +2,6 @@ package com.ainapapy.aigle.services;
 
 import com.ainapapy.aigle.models.Post;
 import com.ainapapy.aigle.repositories.PostRepository;
-import com.ainapapy.aigle.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

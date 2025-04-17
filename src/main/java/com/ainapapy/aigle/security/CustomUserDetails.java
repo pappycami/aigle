@@ -1,14 +1,13 @@
 package com.ainapapy.aigle.security;
 
 import com.ainapapy.aigle.models.User;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class CustomUserDetails implements UserDetails, Serializable {
+public class CustomUserDetails implements UserDetails {
     
     private static final long serialVersionUID = 102L;
     
