@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "aigle.jwt.secret",
+    "type": "java.lang.String",
+    "description": " Clé secrète pour le JWT. Par défaut"
+  },
+  {
+    "name": "spring.session.store-type",
+    "type": "java.lang.String",
+    "description": "Type de stockage de la session. Par défaut, il s'agit de 'jdbc'. notre cas 'redis'"
+  }
+]}
